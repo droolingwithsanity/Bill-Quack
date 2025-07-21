@@ -1,27 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import BillViewers from '../components/BillViewers';
-import BillVisualization from '../components/BillVisualization';
-import Biometrics from '../components/Biometrics';
-import SideAuth from '../components/SideAuth';
-import WebAuthnButton from '../components/WebAuthnButton';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import { faker } from '@faker-js/faker';
 
-const fakeBills = Array.from({ length: 5 }).map(() => ({
-  description: faker.commerce.productName(),
-  amount: faker.finance.amount(10, 200, 2)
-}));
-const fakeUsers = Array.from({ length: 5 }).map(() => ({
-  id: faker.datatype.uuid(),
-  name: faker.name.fullName(),
-  email: faker.internet.email()
-}));
+const BillViewers = dynamic(() => import('../components/BillViewers'), { ssr: false });
+const BillVisualization = dynamic(() => import('../components/BillVisualization'), { ssr: false });
+const SideAuth = dynamic(() => import('../components/SideAuth'), { ssr: false });
+const Biometrics = dynamic(() => import('../components/Biometrics'), { ssr: false });
+const WebAuthnButton = dynamic(() => import('../components/WebAuthnButton'), { ssr: false });
 
 export default function Home() {
+  const [users, setUsers] = useState([]);
+  const [bills, setBills] = useState([]);
+
+  useEffect(() => {
+    setUsers(Array.from({ length: 5 }, () => ({
+      id: faker.string.uuid(),
+      name: faker.person.fullName(),
+      email: faker.internet.email()
+    })));
+
+    setBills([
+      { description: 'Hydro', amount: 100 },
+      { description: 'Internet', amount: 60 },
+      { description: 'Phone', amount: 45 },
+    ]);
+  }, []);
+
   return (
     <div>
-      <h1>AI Billing Dashboard</h1>
-      <BillViewers users={fakeUsers} />
-      <BillVisualization bills={fakeBills} />
+      <h1>AI Billing</h1>
+      <BillViewers users={users} />
+      <BillVisualization bills={bills} />
       <Biometrics />
       <SideAuth />
       <WebAuthnButton />

@@ -1,0 +1,30 @@
+version: '3'
+services:
+  frontend:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: node server.js
+    ports:
+      - '3001:3001'
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/ai-billing
+
+  mongo:
+    image: mongo:5
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
